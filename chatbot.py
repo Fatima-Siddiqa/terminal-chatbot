@@ -35,13 +35,14 @@ def main():
     if not OPENROUTER_API_KEY:
         print("ERROR: OPENROUTER_API_KEY not set in .env")
         sys.exit(1)
-
+    
     print("=" * 50)
-    print("  OpenRouter Chatbot — Llama 3.3 70B (free)")
+    print(f"  OpenRouter Chatbot — {MODEL}")
     print("  Type 'quit' to exit")
     print("=" * 50 + "\n")
 
-    # conversation history — grows with each turn
+
+    # conversation history- grows with each turn
     history = [
         {"role": "system", "content": "You are a helpful assistant."}
     ]
@@ -63,4 +64,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # print(f"Key loaded: {OPENROUTER_API_KEY[:10]}...")
     main()
