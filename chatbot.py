@@ -62,9 +62,14 @@ def main():
         history.append({"role": "user", "content": user_input})
 
         reply = chat(history)
+        if reply.startswith("[ERROR]"):
+            history.pop()  # remove unanswered user message, keep context clean
+            print(f"\nAssistant: {reply}\n")
+            continue
+
         history.append({"role": "assistant", "content": reply})
 
-        if len(history) == 2:  # first turn only
+        if len(history) == 3:  # first turn only
             print(f"  [model: {RESOLVED_MODEL}]")
 
         print(f"\nAssistant: {reply}\n")
