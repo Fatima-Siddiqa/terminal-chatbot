@@ -9,7 +9,10 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1/chat/completions")
 MODEL = os.getenv("OPENROUTER_MODEL", "meta-llama/llama-3.3-70b:free")
 
+RESOLVED_MODEL = None
+
 def chat(history: list[dict]) -> str:
+    global RESOLVED_MODEL
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
@@ -25,22 +28,23 @@ def chat(history: list[dict]) -> str:
     try:
         response = httpx.post(BASE_URL, headers=headers, json=payload, timeout=60.0)
         response.raise_for_status()
-        return response.json()["choices"][0]["message"]["content"]
+        data = response.json()
+        RESOLVED_MODEL = data.get("model", MODEL)
+        return data["choices"][0]["message"]["content"]
     except httpx.HTTPStatusError as e:
         return f"[ERROR] HTTP {e.response.status_code}: {e.response.text}"
     except httpx.RequestError as e:
         return f"[ERROR] Network error: {e}"
-    
+
 def main():
     if not OPENROUTER_API_KEY:
         print("ERROR: OPENROUTER_API_KEY not set in .env")
         sys.exit(1)
-    
+
     print("=" * 50)
     print(f"  OpenRouter Chatbot — {MODEL}")
     print("  Type 'quit' to exit")
     print("=" * 50 + "\n")
-
 
     # conversation history- grows with each turn
     history = [
@@ -60,9 +64,10 @@ def main():
         reply = chat(history)
         history.append({"role": "assistant", "content": reply})
 
+        if len(history) == 2:  # first turn only
+            print(f"  [model: {RESOLVED_MODEL}]")
+
         print(f"\nAssistant: {reply}\n")
 
-
 if __name__ == "__main__":
-    # print(f"Key loaded: {OPENROUTER_API_KEY[:10]}...")
     main()
