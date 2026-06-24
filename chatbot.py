@@ -30,3 +30,37 @@ def chat(history: list[dict]) -> str:
         return f"[ERROR] HTTP {e.response.status_code}: {e.response.text}"
     except httpx.RequestError as e:
         return f"[ERROR] Network error: {e}"
+    
+def main():
+    if not OPENROUTER_API_KEY:
+        print("ERROR: OPENROUTER_API_KEY not set in .env")
+        sys.exit(1)
+
+    print("=" * 50)
+    print("  OpenRouter Chatbot — Llama 3.3 70B (free)")
+    print("  Type 'quit' to exit")
+    print("=" * 50 + "\n")
+
+    # conversation history — grows with each turn
+    history = [
+        {"role": "system", "content": "You are a helpful assistant."}
+    ]
+
+    while True:
+        user_input = input("You: ").strip()
+        if not user_input:
+            continue
+        if user_input.lower() == "quit":
+            print("Goodbye!")
+            break
+
+        history.append({"role": "user", "content": user_input})
+
+        reply = chat(history)
+        history.append({"role": "assistant", "content": reply})
+
+        print(f"\nAssistant: {reply}\n")
+
+
+if __name__ == "__main__":
+    main()
