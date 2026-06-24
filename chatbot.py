@@ -16,8 +16,8 @@ def chat(history: list[dict]) -> str:
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://adepttech.solutions",
-        "X-Title": "ATS Internship Chatbot",
+        "HTTP-Referer": "https://adepttech.solutions", #optional
+        "X-Title": "ATS Internship Chatbot", #optional
     }
     payload = {
         "model": MODEL,
